@@ -127,7 +127,7 @@ public:
             return;
         }
 
-        T* new_data = new T[new_size];
+        T* new_data = new T[new_size]();
 
         int count = (new_size < size) ? new_size : size;
 
@@ -169,6 +169,19 @@ public:
         delete[] data;
         data = nullptr;
         size = 0;
+    }
+
+    void print() const
+    {
+        std::cout << "[";
+        for(int i = 0; i < size; i++)
+        {
+            std::cout << data[i];
+            if(i < size - 1) std::cout << ", ";
+        }
+
+        std::cout << "]";
+        return;
     }
 
 };
