@@ -61,6 +61,13 @@ public:
         copy(other.data, size);
     }
 
+    //конструктор перемещения
+    DynamicArray(DynamicArray<T>&& other) noexcept : data(other.data), size(other.size)
+    {
+        other.data = nullptr;
+        other.size = 0;
+    }
+
 
     //оператор присваивания
     DynamicArray<T>& operator=(const DynamicArray<T>& other)
@@ -76,6 +83,21 @@ public:
                 data = new T[size];
                 copy(other.data, size);
             }
+        }
+
+        return *this;
+    }
+
+    //оператор присваивания с перемещением
+    DynamicArray<T>& operator=(DynamicArray<T>&& other) noexcept
+    {
+        if(this != &other)
+        {
+            delete[] data;  //освободлаем старую память
+            data = other.data;  //перемещаем
+            size = other.size;
+            other.data = nullptr;   //Обнуляем исходник
+            other.size = 0;
         }
 
         return *this;
