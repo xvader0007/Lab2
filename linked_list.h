@@ -1,5 +1,5 @@
-#ifndef LAB2_LINKEDLIST_H
-#define LAB2_LINKEDLIST_H
+#ifndef LAB2_LINKED_LIST_H
+#define LAB2_LINKED_LIST_H
 
 #include <iostream>
 #include <string>
@@ -68,11 +68,41 @@ public:
     }
 
     //конструктор перемещения
-    LinkedList(const LinkedList<T>&& other) noexcept : head(other.head), tail(other.tail), len(other.len)
+    LinkedList(LinkedList<T>&& other) noexcept : head(other.head), tail(other.tail), len(other.len)
     {
         other.head = nullptr;
         other.tail = nullptr;
         other.len = 0;
+    }
+
+    //копирующий оператор присваивания
+    LinkedList<T>& operator=(const LinkedList<T>& other)
+    {
+        if(this != &other)
+        {
+            clear();
+            copy(other);
+        }
+
+        return *this;
+    }
+
+    //перемещающий оператор присваивания
+    LinkedList<T>& operator=(LinkedList<T>&& other) noexcept
+    {
+        if(this != &other)
+        {
+            clear();
+            head = other.head;
+            tail = other.tail;
+            len = other.len;
+
+            other.head = nullptr;
+            other.tail = nullptr;
+            other.len = 0;
+        }
+
+        return *this;
     }
 
     //-------Геттеры-------
@@ -117,7 +147,7 @@ public:
             throw std::out_of_range("IndexOutOfRangeException: не в диапозоне [" +
                                     std::to_string(start) + ", " +
                                     std::to_string(end) + "] при длине списка " +
-                                    std::string(len));
+                                    std::to_string(len));
         }
 
         LinkedList<T>* result = new LinkedList<T>();
@@ -141,7 +171,102 @@ public:
     }
 
     //---------Сеттеры---------
+
+    void Append(T object)
+    {
+        Node* new_Node = new Node(object);
+
+        if(len == 0) head = tail = new_Node;
+        else
+        {
+            tail->next = new_Node;
+            tail = new_Node;
+        }
+
+        len++;
+    }
+
+    void Prepend(T object)
+    {
+        Node* new_Node = new Node(object);
+
+        if(len == 0) head = tail = new_Node;
+        else
+        {
+            new_Node->next = head;
+            head = new_Node;
+        }
+
+        len++;
+    }
+
+    void InsertAt(T object, int index)
+    {
+        if(index < 0 || index > len) throw std::out_of_range("IndexOutOfRangeException: индекс " +
+                                                             std::to_string(index) + "не в диапозоне [0, " + std::to_string(len) + "]");
+
+        if(index == 0)
+        {
+            Prepend(object);
+            return;
+        }
+
+        else if(index == len)
+        {
+            Append(object);
+            return;
+        }
+
+        Node* new_Node = new Node(object);
+        Node* current = head;
+
+        for(int i = 0; i < index - 1; i++) current = current->next;
+
+        new_Node->next = current->next;
+        current->next = new_Node;
+        len++;
+    }
+
+    LinkedList<T>* Concat(LinkedList<T>* other) const
+    {
+        if(other == nullptr) throw std::invalid_argument("Список пустой!");
+
+        LinkedList<T>* result = new LinkedList<T>(*this); //копия
+        Node* current = other->head;
+
+        while(current != nullptr)
+        {
+            result->Append(current->data);
+            current = current->next;
+        }
+
+        return result;
+    }
+
     //-------Перегрузка операторов-------
+    T& operator[](int index)
+    {
+        if(index < 0 || index >= len) throw std::out_of_range("IndexOutOfRangeException: индекс " +
+                                                              std::to_string(index) + "не в диапозоне [0, " + std::to_string(len - 1) + "]");
+
+        Node* current = head;
+
+        for(int i = 0; i < index; i++) current = current->next;
+
+        return current->data;
+    }
+
+    const T& operator[](int index) const
+    {
+        if(index < 0 || index >= len) throw std::out_of_range("IndexOutOfRangeException: индекс " +
+                                                              std::to_string(index) + "не в диапозоне [0, " + std::to_string(len - 1) + "]");
+
+        Node* current = head;
+
+        for(int i = 0; i < index; i++) current = current->next;
+
+        return current->data;
+    }
 
     //-----Деструктор-----
     ~LinkedList()
@@ -149,6 +274,23 @@ public:
         clear();
     }
 
+    void print() const
+    {
+        std::cout << "[";
+
+        Node* current = head;
+
+        for(int i = 0; i < len; i++)
+        {
+            std::cout << current->data;
+
+            if(i < len - 1) std::cout << ", ";
+            current = current->next;
+        }
+
+        std::cout << "]";
+    }
+
 };
 
-#endif //LAB2_LINKEDLIST_H
+#endif //LAB2_LINKED_LIST_H
