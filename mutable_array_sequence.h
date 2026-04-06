@@ -1,0 +1,8 @@
+//
+// Created by user on 07.04.2026.
+//
+
+#ifndef LAB2_MUTABLE_ARRAY_SEQUENCE_H
+#define LAB2_MUTABLE_ARRAY_SEQUENCE_H
+
+#endif //LAB2_MUTABLE_ARRAY_SEQUENCE_H

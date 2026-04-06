@@ -8,4 +8,7 @@ add_executable(Lab2
         dynamic_array.h
         linked_list.h
         sequence.h
-        array_sequence.h)
+        array_sequence.h
+        list_sequence.h
+        mutable_array_sequence.h
+        immutable_array_sequence.h)
