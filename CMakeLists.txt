@@ -9,6 +9,6 @@ add_executable(Lab2
         linked_list.h
         sequence.h
         array_sequence.h
-        list_sequence.h
         mutable_array_sequence.h
+        list_sequence.h
         immutable_array_sequence.h)

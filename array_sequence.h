@@ -54,6 +54,8 @@ protected:
         return this;
     }
 
+    virtual Sequence<T>* Instance() = 0;
+
 public:
     //------------------Констркуторы------------------
     ArraySequence() : objects(new DynamicArray<T>(0)) {}
