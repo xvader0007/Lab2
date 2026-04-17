@@ -54,7 +54,7 @@ protected:
         return this;
     }
 
-    virtual Sequence<T>* Instance() = 0;
+    virtual Sequence<T>* Instance() {return this; }
 
 public:
     //------------------Констркуторы------------------
@@ -120,6 +120,11 @@ public:
         return objects->GetSize();
     }
 
+    const T& operator[](int index) const override
+    {
+        return (*objects)[index];
+    }
+
     //операции
 
     Sequence<T>* Append(T object) override
@@ -153,6 +158,11 @@ public:
         }
 
         return result;
+    }
+
+    T& operator[](int index) override
+    {
+        return (*objects)[index];
     }
 
     //clone для immutable

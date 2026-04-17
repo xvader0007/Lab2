@@ -49,6 +49,16 @@ public:
         return static_cast<MutableArraySequence<T>*>(this->Instance()->InsertAt_Internal(object, index));
     }
 
+    T& operator[](int index)
+    {
+        return (*this->objects)[index];
+    }
+
+    const T& operator[](int index) const
+    {
+        return (*this->objects)[index];
+    }
+
     //-----Деструктор-----
     ~MutableArraySequence() override = default;
 };

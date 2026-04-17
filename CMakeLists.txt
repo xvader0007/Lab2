@@ -13,4 +13,5 @@ add_executable(Lab2
         list_sequence.h
         immutable_array_sequence.h
         mutable_list_sequence.h
-        immutable_list_sequence.h)
+        immutable_list_sequence.h
+        i_collection.h)

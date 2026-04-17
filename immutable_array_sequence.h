@@ -48,6 +48,11 @@ public:
         return this->Instance()->InsertAt_Internal(object, index);
     }
 
+    const T& operator[](int index) const override
+    {
+        return (*this->objects)[index];
+    }
+
     //-----Деструктор-----
     ~ImmutableArraySequence() override = default;
 };
