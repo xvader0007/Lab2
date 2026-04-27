@@ -10,7 +10,6 @@ add_executable(Lab2
         sequence.h
         array_sequence.h
         mutable_array_sequence.h
-        list_sequence.h
         immutable_array_sequence.h
         mutable_list_sequence.h
         immutable_list_sequence.h
@@ -19,4 +18,5 @@ add_executable(Lab2
         ienumerable.h
         array_enumerator.h
         list_enumerator.h
-        tests.cpp)
+        tests.cpp
+        list_sequence.h)
