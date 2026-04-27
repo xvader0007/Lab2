@@ -14,4 +14,9 @@ add_executable(Lab2
         immutable_array_sequence.h
         mutable_list_sequence.h
         immutable_list_sequence.h
-        i_collection.h)
+        i_collection.h
+        option.h
+        ienumerable.h
+        array_enumerator.h
+        list_enumerator.h
+        tests.cpp)

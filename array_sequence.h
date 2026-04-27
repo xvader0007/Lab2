@@ -1,8 +1,10 @@
 #ifndef LAB2_ARRAY_SEQUENCE_H
 #define LAB2_ARRAY_SEQUENCE_H
 
-#include "sequence.h"
 #include "dynamic_array.h"
+#include "array_enumerator.h"
+
+template<class T> class Sequence;
 
 template<class T>
 class ArraySequence : public Sequence<T>
@@ -74,6 +76,11 @@ public:
     }
 
     //-------Геттеры-------
+
+    IEnumerator<T>* GetEnumerator() override
+    {
+        return new ArrayEnumerator<T>(this->objects);
+    }
 
     T GetFirst() const override
     {

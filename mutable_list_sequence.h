@@ -3,6 +3,8 @@
 
 #include "list_sequence.h"
 
+template<class T> class Sequence;
+
 template<class T>
 class MutableListSequence : public ListSequence<T>
 {

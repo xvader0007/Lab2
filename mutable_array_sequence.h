@@ -3,6 +3,8 @@
 
 #include "array_sequence.h"
 
+template<class T> class Sequence;
+
 template<class T>
 class MutableArraySequence : public ArraySequence<T>
 {
@@ -36,17 +38,20 @@ public:
     //переопределение
     MutableArraySequence<T>* Append(T object)
     {
-        return static_cast<MutableArraySequence<T>*>(this->Instance()->Append_Internal(object));
+        this->Append_Internal(object);
+        return this;
     }
 
     MutableArraySequence<T>* Prepend(T object)
     {
-        return static_cast<MutableArraySequence<T>*>(this->Instance()->Prepend_Internal(object));
+        this->Prepend_Internal(object);
+        return this;
     }
 
     MutableArraySequence<T>* InsertAt(T object, int index)
     {
-        return static_cast<MutableArraySequence<T>*>(this->Instance()->InsertAt_Internal(object, index));
+        this->InsertAt_Internal(object, index);
+        return this;
     }
 
     T& operator[](int index)

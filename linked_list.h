@@ -48,6 +48,7 @@ private:
     }
 
 public:
+    template<typename U> friend class ListEnumerator;
     //------------------Констркуторы------------------
 
     //конструктор

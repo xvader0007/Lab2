@@ -163,7 +163,7 @@ public:
 
     //-------Перегрузка операторов-------
 
-    T* operator[](int index)
+    T& operator[](int index)
     {
         if(index < 0 || index >= size)
         {
@@ -174,7 +174,7 @@ public:
         return data[index];
     }
 
-    T* operator[](int index) const
+    T& operator[](int index) const
     {
         if(index < 0 || index >= size)
         {
