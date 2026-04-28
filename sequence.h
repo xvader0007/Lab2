@@ -155,29 +155,33 @@ public:
         return result;
     }
 
-    template<typename Func, typename U>
-    Sequence<U>* FlatMap(Func f) const
+    template<typename Func>
+    auto FlatMap(Func f) const
     {
-        LinkedList<U>* temp_col = new LinkedList<U>();
+        if(this->GetLen() == 0) throw std::runtime_error("FlatMap: пустая последовательность");
+
+        auto* first = f(this->Get(0));
+        using U = decltype(first->Get(0));
+        delete first;
+
+        LinkedList<U>* temp = new LinkedList<U>();
 
         for(int i = 0; i < this->GetLen(); i++)
         {
-            Sequence<U>* innerSeq = f(this->Get(i));
-
-            if(innerSeq != nullptr)
+            Sequence<U>* inner = f(this->Get(i));
+            if(inner != nullptr)
             {
-                for(int j = 0; j < innerSeq->GetLen(); j++)
+                for(int j = 0; j < inner->GetLen(); j++)
                 {
-                    temp_col->Append(innerSeq->Get(j));
+                    temp->Append(inner->Get(j));
                 }
 
-                delete innerSeq;
+                delete inner;
             }
         }
 
-        Sequence<U>* result = new ListSequence<U>(*temp_col);
-
-        delete temp_col;
+        Sequence<U>* result = new ListSequence<U>(*temp);
+        delete temp;
 
         return result;
     }
