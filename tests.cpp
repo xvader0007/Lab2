@@ -138,24 +138,59 @@ void test_flatmap()
             return new ArraySequence<int>(data, 2);
     });
 
+    assert(result->GetLen() == 4 && "FlatMap неверная длина");
+    assert(result->Get(0) == 1 && "FlatMap элемент 0 неверный");
+    assert(result->Get(1) == 11 && "FlatMap элемент 1 неверный");
+    assert(result->Get(2) == 2 && "FlatMap элемент 2 неверный");
+    assert(result->Get(3) == 12 && "FlatMap элемент 3 неверный");
+
+    delete seq;
+    delete result;
 }
 
+void test_exception()
+{
+    int arr[] = {1};
+    Sequence<int>* seq = new ArraySequence<int>(arr, 1);
 
+    bool thrown = false;
+    try
+    {
+        seq->Get(100);
+    }
+    catch(const std::out_of_range)
+    {
+        thrown = false;
+    }
 
+    assert(thrown && "Исключение не генерируется при недопустимом индексе");
 
+    delete seq;
+}
 
+void single_test(const std::string& name, void (*test_f)())
+{
+    std::cout << "# " << name << " ";
+    std::cout.flush(); //чтобы тест появился сразу
 
+    test_f();
 
+    std::cout << "Passed!" << std::endl;
+}
 
+void run_tests()
+{
+    std::cout << "_________Начало тестов_________" << std::endl;
 
+    single_test("Append/Get", test_basic_append_get);
+    single_test("Operator[]", test_operator);
+    single_test("Immutable", test_immutable);
+    single_test("Map", test_map);
+    single_test("Reduce", test_reduce);
+    single_test("Where", test_where);
+    single_test("Zip", test_zip);
+    single_test("FlatMap", test_flatmap);
+    single_test("Exception", test_exception);
 
-
-
-
-
-
-
-
-
-
-
+    std::cout << "_________Тесты завершены_________" << std::endl << std::endl;
+}
