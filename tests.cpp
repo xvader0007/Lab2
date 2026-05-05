@@ -116,12 +116,12 @@ void test_zip()
     assert(zipped->GetLen() == 2 && "Неверная длина Zip");
 
     auto pair = zipped->Get(0);
-    assert(get<0>(pair) == 1 && "Первая пара 0 неверна");
-    assert(get<1>(pair) == "A" && "Вторая пара 0 неверна");
+    assert(std::get<0>(pair) == 1 && "Первая пара 0 неверна");
+    assert(std::get<1>(pair) == "A" && "Вторая пара 0 неверна");
 
     auto pair1 = zipped->Get(1);
-    assert(get<0>(pair1) == 2 && "Первая пара 1 неверна");
-    assert(get<1>(pair1) == "B" && "Вторая пара 1 неверна");
+    assert(std::get<0>(pair1) == 2 && "Первая пара 1 неверна");
+    assert(std::get<1>(pair1) == "B" && "Вторая пара 1 неверна");
 
     delete s1;
     delete s2;

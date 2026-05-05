@@ -3,8 +3,6 @@
 
 #include "array_sequence.h"
 
-template<class T> class Sequence;
-
 template<class T>
 class MutableArraySequence : public ArraySequence<T>
 {

@@ -16,6 +16,7 @@ template<class T>
 class Sequence : public ICollection<T>, public IEnumerable<T>
 {
 public:
+    virtual Sequence<T>* Instance() = 0;
     virtual ~Sequence() = default; //деструктор для полиморфизма
 
     //-------геттеры-------

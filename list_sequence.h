@@ -87,7 +87,7 @@ public:
         return objects->GetLen();
     }
 
-    T& operator[](int index) const override
+    const T& operator[](int index) const override
     {
         return (*objects)[index];
     }
@@ -134,6 +134,11 @@ public:
     Sequence<T>* Clone() const override
     {
         return new ListSequence<T>(*this);
+    }
+
+    Sequence<T>* Instance() override
+    {
+        return this;
     }
 
     //-----Деструктор-----

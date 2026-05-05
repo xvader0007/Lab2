@@ -3,22 +3,16 @@
 
 #include "list_sequence.h"
 
-template<class T> class Sequence;
-
 template<class T>
 class MutableListSequence : public ListSequence<T>
 {
 public:
     //------------------Констркуторы------------------
     MutableListSequence() : ListSequence<T>() {}
-
     MutableListSequence(T* arr, int count) : ListSequence<T>(arr, count) {}
-
     MutableListSequence(const LinkedList<T>& linkedList) : ListSequence<T>(linkedList) {}
-
     //конструктор копирования
     MutableListSequence(const MutableListSequence<T>& other) : ListSequence<T>(other) {}
-
     //конструктор перемещения
     MutableListSequence(MutableListSequence<T>&& other) noexcept : ListSequence<T>(std::move(other)) {}
 
@@ -36,17 +30,20 @@ public:
     //операции
     MutableListSequence<T>* Append(T object)
     {
-        return static_cast<MutableListSequence<T>*>(this->Instance()->Append_Internal(object));
+        ListSequence<T>::Append_Internal(object);
+        return this;
     }
 
     MutableListSequence<T>* Prepend(T object)
     {
-        return static_cast<MutableListSequence<T>*>(this->Instance()->Prepend_Internal(object));
+        ListSequence<T>::Prepend_Internal(object);
+        return this;
     }
 
     MutableListSequence<T>* InsertAt(T object, int index)
     {
-        return static_cast<MutableListSequence<T>*>(this->Instance()->InsertAt_Internal(object, index));
+        ListSequence<T>::InsertAt_Internal(object, index);
+        return this;
     }
 
     T& operator[](int index)
