@@ -2,7 +2,7 @@
 #include <tuple>
 #include <string>
 #include <limits>
-//#include <chrono>
+#include <windows.h>
 #include "sequence.h"
 #include "mutable_array_sequence.h"
 #include "immutable_array_sequence.h"
@@ -13,11 +13,14 @@
 void run_tests();
 
 Sequence<int>* current_seq = nullptr; //глобальная пос. для работы в меню
+Sequence<int>* current_seq2 = nullptr;
 
 void clean()
 {
     delete current_seq;
+    delete current_seq2;
     current_seq = nullptr;
+    current_seq2 = nullptr;
 }
 
 void print_current()
@@ -43,26 +46,48 @@ void clear_input_buffer()
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-
-void create_sequence(int type)
+void print_sequence(Sequence<int>* seq, const std::string& lab)
 {
-    clean();
+    if(!current_seq)
+    {
+        std::cout << "Последовательность не создана!\n";
+        return;
+    }
+
+    std::cout << lab << "[";
+    for(int i = 0; i < seq->GetLen(); i++)
+    {
+        std::cout << seq->Get(i) << (i < seq->GetLen() - 1 ? ", " : "");
+    }
+
+    std::cout << "]\n";
+}
+
+void create_sequence(int type, int slot)
+{
     int arr[] = { 1, 2, 3,};
+    Sequence<int>*& target = (slot == 1) ? current_seq : current_seq2;
+
+    delete target;
+
     switch(type)
     {
         case 1:
             current_seq = new MutableArraySequence<int>(arr, 3);
-            std::cout << "MutableArraySequence: создано успешно!";
+            break;
         case 2:
             current_seq = new MutableListSequence<int>(arr, 3);
-            std::cout << "MutableArraySequence: создано успешно!";
+            break;
         case 3:
             current_seq = new ImmutableArraySequence<int>(arr, 3);
-            std::cout << "ImmutableArraySequence: создано успешно!";
+            break;
         case 4:
             current_seq = new ImmutableListSequence<int>(arr, 3);
-            std::cout << "MutableArraySequence: создано успешно!";
+            break;
     }
+
+    std::cout << "Создано: " << (slot == 1 ? "Seq1" : "Seq2") << ": ";
+    print_sequence(target, "");
 }
 
 void add_element(bool prepend)
@@ -484,9 +509,285 @@ void flatmap_menu()
     delete res;
 }
 
+void try_get()
+{
+    if(!current_seq)
+    {
+        std::cout << "Последовательность не создана!\n";
+        return;
+    }
+
+    int index;
+
+    std::cout << "TryGet, индекс: ";
+    std::cin >> index;
+
+    Option<int> opt = current_seq->TryGet(index);
+    if(opt.is_exist()) std::cout << "Найдено: " << opt.GetValue() << std::endl;
+    else std::cout << "Не найдено (по умолчанию: " << opt.Value_or(-999) << std::endl;
+}
+
+void try_find()
+{
+    if(!current_seq)
+    {
+        std::cout << "Последовательность не создана!\n";
+        return;
+    }
+
+    int value;
+    char op;
+
+    std::cout << "TryFind: выберите условие (>, <, >= (b), <= (l), != (!), == (=))\n";
+    std::cout << "Оператор: ";
+    std::cin >> op;
+
+    std::cout << "Значение: ";
+    std::cin >> value;
+
+    clear_input_buffer();
+
+    Option<int> found;
+
+    switch(op)
+    {
+        case '>':
+            found = current_seq->TryFind([value](int x){return x > value;});
+            break;
+        case '<':
+            found = current_seq->TryFind([value](int x){return x < value;});
+            break;
+        case 'b':
+            found = current_seq->TryFind([value](int x){return x >= value;});
+            break;
+        case 'l':
+            found = current_seq->TryFind([value](int x){return x <= value;});
+            break;
+        case '!':
+            found = current_seq->TryFind([value](int x){return x != value;});
+            break;
+        case '=':
+            found = current_seq->TryFind([value](int x){return x == value;});
+            break;
+        default:
+            std::cout << "Неверный выбор!\n";
+            return;
+    }
+
+    if(found.is_exist()) std::cout << "Первое совпадение: " << found.GetValue() << std::endl;
+    else std::cout << "Не найдено!\n";
+}
+
+void concat_menu()
+{
+    if(!current_seq)
+    {
+        std::cout << "Последовательность не создана!\n";
+        return;
+    }
+
+    if(!current_seq2)
+    {
+        std::cout << "Последовательность не создана!\n";
+        return;
+    }
+
+    std::cout << "Первая последовательность: ";
+    print_sequence(current_seq, "");
+    std::cout << "Вторая последовательность: ";
+    print_sequence(current_seq2, "");
+
+    Sequence<int>* result = current_seq->Concat(current_seq2);
+
+    std::cout << "Результат concat: [";
+    for(int i = 0; i < result->GetLen(); i++)
+    {
+        std::cout << result->Get(i) << (i < result->GetLen() - 1 ? ", " : "");
+    }
+    std::cout << "]\n";
+
+    delete result;
+}
+
+void clone_menu()
+{
+    if(!current_seq)
+    {
+        std::cout << "Последовательность не создана!\n";
+        return;
+    }
+
+    Sequence<int>* clone = current_seq->Clone();
+
+    std::cout << "Оригинал: ";
+    print_current();
+
+    std::cout << "Клон: [";
+    for(int i = 0; i < clone->GetLen(); i++)
+    {
+        std::cout << clone->Get(i) << (i < clone->GetLen() - 1 ? ", " : "");
+    }
+    std::cout << "]\n";
+
+    delete clone;
+}
+
+void show_menu()
+{
+    std::cout << "\n________________MENU_________________\n";
+    std::cout << "| Создание (Seq1):                  |\n";
+    std::cout << "| 1.MutableArraySequence            |\n";
+    std::cout << "| 2.MutableListSequence             |\n";
+    std::cout << "| 3.ImmutableArraySequence          |\n";
+    std::cout << "| 4.ImmutableListSequence           |\n";
+    std::cout << "|___________________________________|\n";
+    std::cout << "| Создание (Seq2):                  |\n";
+    std::cout << "| 5.MutableArraySequence            |\n";
+    std::cout << "| 6.MutableListSequence             |\n";
+    std::cout << "| 7.ImmutableArraySequence          |\n";
+    std::cout << "| 8.ImmutableListSequence           |\n";
+    std::cout << "|___________________________________|\n";
+    std::cout << "| 9.Append                          |\n";
+    std::cout << "| 10.Prepend                        |\n";
+    std::cout << "| 11.InsertAt                       |\n";
+    std::cout << "|___________________________________|\n";
+    std::cout << "| Доступ:                           |\n";
+    std::cout << "| 12.Get(index)                     |\n";
+    std::cout << "| 13.operator[] (чтение)            |\n";
+    std::cout << "| 14.operator[] (запись)            |\n";
+    std::cout << "| 15.Print sequence                 |\n";
+    std::cout << "|___________________________________|\n";
+    std::cout << "| Дополнительные функции:           |\n";
+    std::cout << "| 16.Map(a*x + b)                   |\n";
+    std::cout << "| 17.Reduce(sum/prod/min/max)       |\n";
+    std::cout << "| 18.Where(условие)                 |\n";
+    std::cout << "| 19.Zip                            |\n";
+    std::cout << "| 20.FlatMap                        |\n";
+    std::cout << "| 21.Concat                         |\n";
+    std::cout << "| 22.Clone                          |\n";
+    std::cout << "|___________________________________|\n";
+    std::cout << "| Option / Try:                     |\n";
+    std::cout << "| 23. TryGet(index)                 |\n";
+    std::cout << "| 24. TryFind(условие)              |\n";
+    std::cout << "|___________________________________|\n";
+    std::cout << "| Система:                          |\n";
+    std::cout << "| 25. Запустить все тесты           |\n";
+    std::cout << "| 0. Выход                          |\n";
+    std::cout << "|___________________________________|\n";
+}
+
 int main()
 {
+    SetConsoleOutputCP(CP_UTF8);
 
+    std::cout << "_____________________________________\n";
+    std::cout << "|       Лабораторная работа №2      |\n";
+    std::cout << "|                                   |\n";
+    std::cout << "| Михеев Дмитрий    группа: Б25-507 |\n";
+    std::cout << "|___________________________________|\n";
 
-  return 0;
+    int choice;
+
+    do
+    {
+        show_menu();
+        std::cout << "Ваш выбор: ";
+
+        if(!(std::cin >> choice))
+        {
+            clear_input_buffer();
+            std::cout << "Ошибка: введите число от 0 до 22!\n";
+            continue;
+        }
+
+        clear_input_buffer();
+        std::cout << std::endl;
+
+        try
+        {
+            switch(choice)
+            {
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        create_sequence(choice, 1);
+                    break;
+                }
+                {
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        create_sequence(choice - 4, 2);
+                        break;
+                }
+                case 9:
+                    add_element(false); //append
+                    break;
+                case 10:
+                    add_element(true); //prepend
+                    break;
+                case 11:
+                    insert_at();
+                    break;
+                case 12:
+                    get_element();
+                    break;
+                case 13:
+                    read_bracket();
+                    break;
+                case 14:
+                    write_bracket();
+                    break;
+                case 15:
+                    std::cout << "Seq 1: ";
+                    print_sequence(current_seq, "");
+                    std::cout << "Seq 2: ";
+                    print_sequence(current_seq2, "");
+                    break;
+                case 16:
+                    map_menu();
+                    break;
+                case 17:
+                    reduce_map();
+                    break;
+                case 18:
+                    where_menu();
+                    break;
+                case 19:
+                    zip_menu();
+                    break;
+                case 20:
+                    flatmap_menu();
+                    break;
+                case 21:
+                    concat_menu();
+                    break;
+                case 22:
+                    clone_menu();
+                    break;
+                case 23:
+                    try_get();
+                    break;
+                case 24:
+                    try_find();
+                    break;
+                case 25:
+                    run_tests();
+                case 0:
+                    break;
+                default:
+                    std::cout << "Неверный выбор!\n";
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::cout << "Исключение: " << e.what() << std::endl;
+        }
+    }
+    while(choice != 0);
+
+    return 0;
 }
