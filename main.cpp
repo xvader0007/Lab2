@@ -35,7 +35,7 @@ void print_current()
     for(int i = 0; i < current_seq->GetLen(); i++)
     {
         std::cout << current_seq->Get(i);
-        if(i < current_seq->GetLen() - 1) std::cout << " , ";
+        if(i < current_seq->GetLen() - 1) std::cout << ", ";
     }
     std::cout << "] (длина: " << current_seq->GetLen() << ")\n";
 }
@@ -48,7 +48,7 @@ void clear_input_buffer()
 
 void print_sequence(Sequence<int>* seq, const std::string& lab)
 {
-    if(!current_seq)
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -73,16 +73,16 @@ void create_sequence(int type, int slot)
     switch(type)
     {
         case 1:
-            current_seq = new MutableArraySequence<int>(arr, 3);
+            target = new MutableArraySequence<int>(arr, 3);
             break;
         case 2:
-            current_seq = new MutableListSequence<int>(arr, 3);
+            target = new MutableListSequence<int>(arr, 3);
             break;
         case 3:
-            current_seq = new ImmutableArraySequence<int>(arr, 3);
+            target = new ImmutableArraySequence<int>(arr, 3);
             break;
         case 4:
-            current_seq = new ImmutableListSequence<int>(arr, 3);
+            target = new ImmutableListSequence<int>(arr, 3);
             break;
     }
 
@@ -110,7 +110,7 @@ void add_element(bool prepend)
     }
 
     current_seq = prepend ? current_seq->Prepend(value) : current_seq->Append(value);
-    std::cout << "Элемент " << (prepend ? "в начало" : "в конец") << "добавлен!\n";
+    std::cout << "Элемент " << (prepend ? "в начало" : "в конец") << " добавлен!\n";
 }
 
 void insert_at()
@@ -249,7 +249,7 @@ void reduce_map()
     std::cout << "\n1: сумма (+)\n";
     std::cout << "\n2: произведение (*)\n";
     std::cout << "\n3: максимум\n";
-    std::cout << "\n4: миниммум\n";
+    std::cout << "\n4: минимум\n";
 
     int op;
 
@@ -314,36 +314,36 @@ void where_menu()
     std::cout << "Where: выберите оператор (>, <, >= (b), <= (l), != (!), == (=))\n";
     std::cout << "Оператор: ";
 
-    int threhold;
+    int threshold;
     char op;
     std::cin >> op;
     std::cout << "Значение: ";
-    std::cin >> threhold;
+    std::cin >> threshold;
 
     clear_input_buffer();
 
     Sequence<int>* res = nullptr;
 
-    std::cout << "Фильтр (x " << op << " " << threhold << "): [";
+    std::cout << "Фильтр (x " << op << " " << threshold << "): [";
     switch (op)
     {
         case '>':
-            res = current_seq->Where([threhold](int x){return x > threhold;});
+            res = current_seq->Where([threshold](int x){return x > threshold;});
             break;
         case '<':
-            res = current_seq->Where([threhold](int x){return x < threhold;});
+            res = current_seq->Where([threshold](int x){return x < threshold;});
             break;
         case 'b':
-            res = current_seq->Where([threhold](int x){return x >= threhold;});
+            res = current_seq->Where([threshold](int x){return x >= threshold;});
             break;
         case 'l':
-            res = current_seq->Where([threhold](int x){return x <= threhold;});
+            res = current_seq->Where([threshold](int x){return x <= threshold;});
             break;
         case '!':
-            res = current_seq->Where([threhold](int x){return x != threhold;});
+            res = current_seq->Where([threshold](int x){return x != threshold;});
             break;
         case '=':
-            res = current_seq->Where([threhold](int x){return x == threhold;});
+            res = current_seq->Where([threshold](int x){return x == threshold;});
             break;
         default:
             std::cout << "Неверный выбор!\n";
@@ -524,7 +524,7 @@ void try_get()
 
     Option<int> opt = current_seq->TryGet(index);
     if(opt.is_exist()) std::cout << "Найдено: " << opt.GetValue() << std::endl;
-    else std::cout << "Не найдено (по умолчанию: " << opt.Value_or(-999) << std::endl;
+    else std::cout << "Не найдено (по умолчанию: " << opt.Value_or(-999) << ")\n";
 }
 
 void try_find()
@@ -696,7 +696,7 @@ int main()
         if(!(std::cin >> choice))
         {
             clear_input_buffer();
-            std::cout << "Ошибка: введите число от 0 до 22!\n";
+            std::cout << "Ошибка: введите число от 0 до 25!\n";
             continue;
         }
 
@@ -776,6 +776,7 @@ int main()
                     break;
                 case 25:
                     run_tests();
+                    break;
                 case 0:
                     break;
                 default:
