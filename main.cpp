@@ -261,13 +261,13 @@ void reduce_map()
     {
         case 1:
         {
-            int sum = current_seq->Reduce([](int acc, int x){return acc + x;}, 0);
+            long int sum = current_seq->Reduce([](long int acc, int x){return acc + x;}, 0);
             std::cout << "Сумма: " << sum << "\n";
             break;
         }
         case 2:
         {
-            int prod = current_seq->Reduce([](int acc, int x) { return acc * x; }, 1);
+            long int prod = current_seq->Reduce([](long int acc, int x) { return acc * x; }, 1);
             std::cout << "Произведение: " << prod << "\n";
             break;
         }
