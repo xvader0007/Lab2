@@ -40,12 +40,6 @@ void print_current()
     std::cout << "] (длина: " << current_seq->GetLen() << ")\n";
 }
 
-void clear_input_buffer()
-{
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
 void print_sequence(Sequence<int>* seq, const std::string& lab)
 {
     if(!seq)
@@ -61,6 +55,37 @@ void print_sequence(Sequence<int>* seq, const std::string& lab)
     }
 
     std::cout << "]\n";
+}
+
+void clear_input_buffer()
+{
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+Sequence<int>*& select_sequence(const std::string& name)
+{
+    std::cout << name;
+    std::cout << ": выберите последовательность: \n";
+    std::cout << "1. Seq1 ";
+    print_sequence(current_seq, "");
+    std::cout << "2. Seq2 ";
+    print_sequence(current_seq2, "");
+    std::cout << "Выбор (1/2): ";
+
+    int choice;
+
+    if (!(std::cin >> choice) || (choice != 1 && choice != 2))
+    {
+        clear_input_buffer();
+        std::cout << "Неверный выбор!\n";
+
+        static Sequence<int>* seq3 = nullptr;
+        return seq3;
+    }
+    clear_input_buffer();
+
+    return (choice == 1) ? current_seq : current_seq2;
 }
 
 void create_sequence(int type, int slot)
@@ -92,7 +117,9 @@ void create_sequence(int type, int slot)
 
 void add_element(bool prepend)
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence(prepend ? "Prepend" : "Append");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -109,13 +136,14 @@ void add_element(bool prepend)
         return;
     }
 
-    current_seq = prepend ? current_seq->Prepend(value) : current_seq->Append(value);
+    seq = prepend ? seq->Prepend(value) : seq->Append(value);
     std::cout << "Элемент " << (prepend ? "в начало" : "в конец") << " добавлен!\n";
 }
 
 void insert_at()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("InsertAt");
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -129,7 +157,7 @@ void insert_at()
 
     try
     {
-        current_seq = current_seq->InsertAt(value, index);
+        seq = seq->InsertAt(value, index);
         std::cout << "Вставлено!\n";
     }
     catch(const std::exception& e)
@@ -140,7 +168,9 @@ void insert_at()
 
 void get_element()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("Get");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -153,7 +183,7 @@ void get_element()
 
     try
     {
-        std::cout << "seq[" << index << "] = " << current_seq->Get(index) << "\n";
+        std::cout << "seq[" << index << "] = " << seq->Get(index) << "\n";
     }
     catch(const std::exception& e)
     {
@@ -163,7 +193,9 @@ void get_element()
 
 void read_bracket()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("operator[]");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -175,7 +207,7 @@ void read_bracket()
 
     try
     {
-        std::cout << "(*seq)[" << index << "] = " << (*current_seq)[index] << "\n";
+        std::cout << "(*seq)[" << index << "] = " << (*seq)[index] << "\n";
     }
     catch(const std::exception& e)
     {
@@ -185,7 +217,9 @@ void read_bracket()
 
 void write_bracket()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("operator[]");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -200,7 +234,7 @@ void write_bracket()
 
     try
     {
-        (*current_seq)[index] = value;
+        (*seq)[index] = value;
         std::cout << "Изменено!\n";
     }
     catch(const std::exception& e)
@@ -211,7 +245,9 @@ void write_bracket()
 
 void map_menu()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("Map");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -226,7 +262,7 @@ void map_menu()
     std::cin >> b;
     clear_input_buffer();
 
-    auto* res = current_seq->Map([k, b](int x) {return k * x + b;});
+    auto* res = seq->Map([k, b](int x) {return k * x + b;});
     std::cout << "Результат f(x) = " << k << "*x + " << b << ": [";
     for(int i = 0; i < res->GetLen(); i++)
     {
@@ -239,7 +275,9 @@ void map_menu()
 
 void reduce_map()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("Reduce");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -261,39 +299,39 @@ void reduce_map()
     {
         case 1:
         {
-            long int sum = current_seq->Reduce([](long int acc, int x){return acc + x;}, 0);
+            long int sum = seq->Reduce([](long int acc, int x){return acc + x;}, 0);
             std::cout << "Сумма: " << sum << "\n";
             break;
         }
         case 2:
         {
-            long int prod = current_seq->Reduce([](long int acc, int x) { return acc * x; }, 1);
+            long int prod = seq->Reduce([](long int acc, int x) { return acc * x; }, 1);
             std::cout << "Произведение: " << prod << "\n";
             break;
         }
 
         case 3:
         {
-            if(current_seq->GetLen() == 0)
+            if(seq->GetLen() == 0)
             {
                 std::cout << "Пустая последовательность!\n";
                 return;
             }
 
-            int maxx = current_seq->Reduce([](int acc, int x) {return (x > acc) ? x : acc;}, current_seq->Get(0));
+            int maxx = seq->Reduce([](int acc, int x) {return (x > acc) ? x : acc;}, seq->Get(0));
             std::cout << "Максимум: " << maxx << "\n";
             break;
         }
 
         case 4:
         {
-            if(current_seq->GetLen() == 0)
+            if(seq->GetLen() == 0)
             {
                 std::cout << "Пустая последовательность!\n";
                 return;
             }
 
-            int minn = current_seq->Reduce([](int acc, int x) {return (x < acc) ? x : acc;}, current_seq->Get(0));
+            int minn = seq->Reduce([](int acc, int x) {return (x < acc) ? x : acc;}, seq->Get(0));
             std::cout << "Минимум: " << minn << "\n";
             break;
         }
@@ -305,7 +343,9 @@ void reduce_map()
 
 void where_menu()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("Where");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -328,22 +368,22 @@ void where_menu()
     switch (op)
     {
         case '>':
-            res = current_seq->Where([threshold](int x){return x > threshold;});
+            res = seq->Where([threshold](int x){return x > threshold;});
             break;
         case '<':
-            res = current_seq->Where([threshold](int x){return x < threshold;});
+            res = seq->Where([threshold](int x){return x < threshold;});
             break;
         case 'b':
-            res = current_seq->Where([threshold](int x){return x >= threshold;});
+            res = seq->Where([threshold](int x){return x >= threshold;});
             break;
         case 'l':
-            res = current_seq->Where([threshold](int x){return x <= threshold;});
+            res = seq->Where([threshold](int x){return x <= threshold;});
             break;
         case '!':
-            res = current_seq->Where([threshold](int x){return x != threshold;});
+            res = seq->Where([threshold](int x){return x != threshold;});
             break;
         case '=':
-            res = current_seq->Where([threshold](int x){return x == threshold;});
+            res = seq->Where([threshold](int x){return x == threshold;});
             break;
         default:
             std::cout << "Неверный выбор!\n";
@@ -466,7 +506,9 @@ void zip_menu()
 
 void flatmap_menu()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("Flatmap");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -489,7 +531,7 @@ void flatmap_menu()
 
     clear_input_buffer();
 
-    auto* res = current_seq->FlatMap([op, N](int x){
+    auto* res = seq->FlatMap([op, N](int x){
         int* data = new int[2];
         if(op == 1) {data[0] = x; data[1] = x;}
         else if(op == 2) {data[0] = x; data[1] = x * N;}
@@ -511,7 +553,9 @@ void flatmap_menu()
 
 void try_get()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("TryGet");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -522,14 +566,16 @@ void try_get()
     std::cout << "TryGet, индекс: ";
     std::cin >> index;
 
-    Option<int> opt = current_seq->TryGet(index);
+    Option<int> opt = seq->TryGet(index);
     if(opt.is_exist()) std::cout << "Найдено: " << opt.GetValue() << std::endl;
     else std::cout << "Не найдено (по умолчанию: " << opt.Value_or(-999) << ")\n";
 }
 
 void try_find()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("TryFind");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
@@ -552,22 +598,22 @@ void try_find()
     switch(op)
     {
         case '>':
-            found = current_seq->TryFind([value](int x){return x > value;});
+            found = seq->TryFind([value](int x){return x > value;});
             break;
         case '<':
-            found = current_seq->TryFind([value](int x){return x < value;});
+            found = seq->TryFind([value](int x){return x < value;});
             break;
         case 'b':
-            found = current_seq->TryFind([value](int x){return x >= value;});
+            found = seq->TryFind([value](int x){return x >= value;});
             break;
         case 'l':
-            found = current_seq->TryFind([value](int x){return x <= value;});
+            found = seq->TryFind([value](int x){return x <= value;});
             break;
         case '!':
-            found = current_seq->TryFind([value](int x){return x != value;});
+            found = seq->TryFind([value](int x){return x != value;});
             break;
         case '=':
-            found = current_seq->TryFind([value](int x){return x == value;});
+            found = seq->TryFind([value](int x){return x == value;});
             break;
         default:
             std::cout << "Неверный выбор!\n";
@@ -611,16 +657,18 @@ void concat_menu()
 
 void clone_menu()
 {
-    if(!current_seq)
+    Sequence<int>*& seq = select_sequence("Clone");
+
+    if(!seq)
     {
         std::cout << "Последовательность не создана!\n";
         return;
     }
 
-    Sequence<int>* clone = current_seq->Clone();
+    Sequence<int>* clone = seq->Clone();
 
     std::cout << "Оригинал: ";
-    print_current();
+    print_sequence(seq, "");
 
     std::cout << "Клон: [";
     for(int i = 0; i < clone->GetLen(); i++)

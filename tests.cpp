@@ -92,17 +92,6 @@ void test_where()
     delete res;
 }
 
-/*
-void test_option_try()
-{
-    int arr[] = {10, 20};
-    Sequence<int>* seq = new ArraySequence<int>(arr, 2);
-
-    //успешно
-    Option<int> opt1 = seq->TryGet(1);
-    assert(opt1.)
-}*/
-
 void test_zip()
 {
     int nums[] = {1, 2};
@@ -158,9 +147,9 @@ void test_exception()
     {
         seq->Get(100);
     }
-    catch(const std::out_of_range)
+    catch(const std::out_of_range&)
     {
-        thrown = false;
+        thrown = true;
     }
 
     assert(thrown && "Исключение не генерируется при недопустимом индексе");
