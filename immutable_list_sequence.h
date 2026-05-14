@@ -34,26 +34,26 @@ public:
     //операции
     Sequence<T>* Append(T object) override
     {
-        ImmutableListSequence<T>* newInstance = static_cast<ImmutableListSequence<T>*>(this->Clone());
-        newInstance->ListSequence<T>::Append_Internal(object);
-        return newInstance;
+        auto* instance = static_cast<ImmutableListSequence<T>*>(this->Clone());
+        instance->ListSequence<T>::Append_Internal(object);
+        return instance;
     }
 
     Sequence<T>* Prepend(T object) override
     {
-        ImmutableListSequence<T>* newInstance = static_cast<ImmutableListSequence<T>*>(this->Clone());
-        newInstance->ListSequence<T>::Prepend_Internal(object);
-        return newInstance;
+        auto* instance= static_cast<ImmutableListSequence<T>*>(this->Clone());
+        instance->ListSequence<T>::Prepend_Internal(object);
+        return instance;
     }
 
     Sequence<T>* InsertAt(T object, int index) override
     {
-        ImmutableListSequence<T>* newInstance = static_cast<ImmutableListSequence<T>*>(this->Clone());
-        newInstance->ListSequence<T>::InsertAt_Internal(object, index);
-        return newInstance;
+        auto* instance = static_cast<ImmutableListSequence<T>*>(this->Clone());
+        instance->ListSequence<T>::InsertAt_Internal(object, index);
+        return instance;
     }
 
-    const T& operator[](int index) const
+    const T& operator[](int index) const override
     {
         return (*this->objects)[index];
     }

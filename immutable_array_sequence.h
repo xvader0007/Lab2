@@ -35,23 +35,23 @@ public:
     //операции
     Sequence<T>* Append(T object) override
     {
-        ImmutableArraySequence<T>* newInstance = static_cast<ImmutableArraySequence<T>*>(this->Clone());
-        newInstance->ArraySequence<T>::Append_Internal(object);
-        return newInstance;
+        auto* instance = static_cast<ImmutableArraySequence<T>*>(this->Clone());
+        instance->ArraySequence<T>::Append_Internal(object);
+        return instance;
     }
 
     Sequence<T>* Prepend(T object) override
     {
-        ImmutableArraySequence<T>* newInstance = static_cast<ImmutableArraySequence<T>*>(this->Clone());
-        newInstance->ArraySequence<T>::Prepend_Internal(object);
-        return newInstance;
+        auto* instance = static_cast<ImmutableArraySequence<T>*>(this->Clone());
+        instance->ArraySequence<T>::Prepend_Internal(object);
+        return instance;
     }
 
     Sequence<T>* InsertAt(T object, int index) override
     {
-        ImmutableArraySequence<T>* newInstance = static_cast<ImmutableArraySequence<T>*>(this->Clone());
-        newInstance->ArraySequence<T>::InsertAt_Internal(object, index);
-        return newInstance;
+        auto* instance = static_cast<ImmutableArraySequence<T>*>(this->Clone());
+        instance->ArraySequence<T>::InsertAt_Internal(object, index);
+        return instance;
     }
 
     const T& operator[](int index) const override

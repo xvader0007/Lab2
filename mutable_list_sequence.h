@@ -28,30 +28,33 @@ public:
     }
 
     //операции
-    MutableListSequence<T>* Append(T object)
+    Sequence<T>* Append(T object) override
     {
-        ListSequence<T>::Append_Internal(object);
-        return this;
+        auto* instance = static_cast<MutableListSequence<T>*>(this->Instance());
+        instance->ListSequence<T>::Append_Internal(object);
+        return instance;
     }
 
-    MutableListSequence<T>* Prepend(T object)
+    Sequence<T>* Prepend(T object) override
     {
-        ListSequence<T>::Prepend_Internal(object);
-        return this;
+        auto* instance = static_cast<MutableListSequence<T>*>(this->Instance());
+        instance->ListSequence<T>::Prepend_Internal(object);
+        return instance;
     }
 
-    MutableListSequence<T>* InsertAt(T object, int index)
+    Sequence<T>* InsertAt(T object, int index) override
     {
-        ListSequence<T>::InsertAt_Internal(object, index);
-        return this;
+        auto* instance = static_cast<MutableListSequence<T>*>(this->Instance());
+        instance->ListSequence<T>::InsertAt_Internal(object, index);
+        return instance;
     }
 
-    T& operator[](int index)
+    T& operator[](int index) override
     {
         return (*this->objects)[index];
     }
 
-    const T& operator[](int index) const
+    const T& operator[](int index) const override
     {
         return (*this->objects)[index];
     }
