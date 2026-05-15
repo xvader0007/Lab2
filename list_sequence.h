@@ -68,7 +68,22 @@ public:
 
     T Get(int index) const override
     {
-        return objects->Get(index);
+        if(index < 0 || index >= this->GetLen()) throw std::out_of_range("Index out of range");
+
+        IEnumerator<T>* enumerator = this->GetEnumerator();
+
+        for(int i = 0; i <= index; i++)
+        {
+            if(!enumerator->MoveNext())
+            {
+                delete enumerator;
+                throw std::out_of_range("Index out of range");
+            }
+        }
+
+        T result = enumerator->GetCurrent();
+        delete enumerator;
+        return result;
     }
 
     Sequence<T>* GetSubsequence(int start, int end) const override
