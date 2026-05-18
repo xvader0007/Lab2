@@ -13,27 +13,39 @@ protected:
     DynamicArray<T>* objects; //массив
 
     //внутрення логика
-    Sequence<T>* Append_Internal(T object)
+    void Append_Internal(T object)
     {
-        objects->Resize(objects->GetSize() + 1);
-        objects->Set(objects->GetSize() - 1, object);
-
-        return this;
+        int oldSize = objects->GetSize();
+        objects->Resize(oldSize + 1);
+        objects->Set(oldSize, object);
     }
-    Sequence<T>* Prepend_Internal(T object)
-    {
-        objects->Resize(objects->GetSize() + 1);
 
-        for(int i = objects->GetSize() - 1; i > 0 ; i--)
-        {
+    void Prepend_Internal(T object)
+    {
+        int oldSize = objects->GetSize();
+        objects->Resize(oldSize + 1);
+
+        for (int i = oldSize; i > 0; i--) {
             objects->Set(i, objects->Get(i - 1));
         }
-
         objects->Set(0, object);
-
-        return this;
     }
 
+    void InsertAt_Internal(T object, int index) {
+        if (index < 0 || index > objects->GetSize()) {
+            throw std::out_of_range("IndexOutOfRangeException: индекс " +
+                                    std::to_string(index) + " не в диапазоне [0, " +
+                                    std::to_string(objects->GetSize()) + "]");
+        }
+        int oldSize = objects->GetSize();
+        objects->Resize(oldSize + 1);
+
+        for (int i = oldSize; i > index; i--) {
+            objects->Set(i, objects->Get(i - 1));
+        }
+        objects->Set(index, object);
+    }
+    /*
     Sequence<T>* InsertAt_Internal(T object, int index)
     {
         if(index < 0 || index >= objects->GetSize())
@@ -54,11 +66,10 @@ protected:
         objects->Set(index, object);
 
         return this;
-    }
-
-    virtual Sequence<T>* Instance() {return this; }
+    }*/
 
 public:
+    virtual Sequence<T>* Instance() override {return this; }
     //------------------Констркуторы------------------
     ArraySequence() : objects(new DynamicArray<T>(0)) {}
 
@@ -77,7 +88,7 @@ public:
 
     //-------Геттеры-------
 
-    IEnumerator<T>* GetEnumerator() override
+    IEnumerator<T>* GetEnumerator() const override
     {
         return new ArrayEnumerator<T>(this->objects);
     }
@@ -96,9 +107,20 @@ public:
         return objects->Get(objects->GetSize() - 1);
     }
 
-    T Get(int index) const override
-    {
-        return objects->Get(index);
+    T Get(int index) const override {
+        if (index < 0 || index >= objects->GetSize()) {
+            throw std::out_of_range("Index out of range");
+        }
+        IEnumerator<T>* enumerator = this->GetEnumerator();
+        for (int i = 0; i <= index; ++i) {
+            if (!enumerator->MoveNext()) {
+                delete enumerator;
+                throw std::out_of_range("Index out of range");
+            }
+        }
+        T result = enumerator->GetCurrent();
+        delete enumerator;
+        return result;
     }
 
     Sequence<T>* GetSubsequence(int start, int end) const override
@@ -134,19 +156,22 @@ public:
 
     //операции
 
-    Sequence<T>* Append(T object) override
-    {
-        return Append_Internal(object);
+    Sequence<T>* Append(T object) override {
+        auto* instance = static_cast<ArraySequence<T>*>(this->Instance());
+        instance->ArraySequence<T>::Append_Internal(object);
+        return instance;
     }
 
-    Sequence<T>* Prepend(T object) override
-    {
-        return Prepend_Internal(object);
+    Sequence<T>* Prepend(T object) override {
+        auto* instance = static_cast<ArraySequence<T>*>(this->Instance());
+        instance->ArraySequence<T>::Prepend_Internal(object);
+        return instance;
     }
 
-    Sequence<T>* InsertAt(T object, int index) override
-    {
-        return InsertAt_Internal(object, index);
+    Sequence<T>* InsertAt(T object, int index) override {
+        auto* instance = static_cast<ArraySequence<T>*>(this->Instance());
+        instance->ArraySequence<T>::InsertAt_Internal(object, index);
+        return instance;
     }
 
     Sequence<T>* Concat(Sequence<T>* other) const override

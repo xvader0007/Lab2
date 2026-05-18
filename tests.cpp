@@ -167,6 +167,87 @@ void single_test(const std::string& name, void (*test_f)())
     std::cout << "Passed!" << std::endl;
 }
 
+void test_get_out_of_bounds()
+{
+    int arr[] = {1, 2, 3};
+    Sequence<int>* seq = new ArraySequence<int>(arr, 3);
+
+    bool thrown = false;
+    try { seq->Get(10); } catch (const std::out_of_range&) { thrown = true; }
+    assert(thrown && "Get(10) должен выбрасывать out_of_range");
+
+    thrown = false;
+    try { seq->Get(-1); } catch (const std::out_of_range&) { thrown = true; }
+    assert(thrown && "Get(-1) должен выбрасывать out_of_range");
+
+    delete seq;
+}
+
+void test_insert_at_invalid_index()
+{
+    int arr[] = {1, 2, 3};
+    Sequence<int>* seq = new ArraySequence<int>(arr, 3);
+
+    bool thrown = false;
+    try { seq->InsertAt(999, 100); } catch (const std::out_of_range&) { thrown = true; }
+    assert(thrown && "InsertAt с индексом > size должен выбрасывать исключение");
+
+    delete seq;
+}
+
+void test_zip_nullptr()
+{
+    int arr[] = {1, 2, 3};
+    Sequence<int>* seq = new ArraySequence<int>(arr, 3);
+
+    bool thrown = false;
+    try { seq->Zip<int>(nullptr); } catch (const std::invalid_argument&) { thrown = true; }
+    assert(thrown && "Zip(nullptr) должен выбрасывать invalid_argument");
+
+    delete seq;
+}
+
+void test_reduce_empty_sequence()
+{
+    // Создаём пустую последовательность
+    int empty[] = {};
+    Sequence<int>* seq = new ArraySequence<int>(empty, 0);
+
+    int result = seq->Reduce([](int acc, int x) { return acc + x; }, 42);
+    assert(result == 42 && "Reduce на пустой последовательности должен вернуть начальное значение");
+
+    delete seq;
+}
+
+void test_try_get_invalid_index()
+{
+    int arr[] = {1, 2, 3};
+    Sequence<int>* seq = new ArraySequence<int>(arr, 3);
+
+    Option<int> opt = seq->TryGet(100);
+
+    assert(!opt.is_exist() && "TryGet(100) должен вернуть None");
+    assert(opt.Value_or(-999) == -999 && "ValueOr должен вернуть значение по умолчанию");
+
+    delete seq;
+}
+
+void test_get_first_last_empty()
+{
+    int empty[] = {};
+    Sequence<int>* seq = new ArraySequence<int>(empty, 0);
+
+    bool thrown = false;
+    try { seq->GetFirst(); } catch (const std::out_of_range&) { thrown = true; }
+    assert(thrown && "GetFirst на пустой последовательности должен выбрасывать исключение");
+
+    thrown = false;
+    try { seq->GetLast(); } catch (const std::out_of_range&) { thrown = true; }
+    assert(thrown && "GetLast на пустой последовательности должен выбрасывать исключение");
+
+    delete seq;
+}
+
 void run_tests()
 {
     std::cout << "_________Начало тестов_________" << std::endl;
@@ -180,6 +261,13 @@ void run_tests()
     single_test("Zip", test_zip);
     single_test("FlatMap", test_flatmap);
     single_test("Exception", test_exception);
+
+    single_test("Get out of bounds", test_get_out_of_bounds);
+    single_test("InsertAt invalid index", test_insert_at_invalid_index);
+    single_test("Zip nullptr", test_zip_nullptr);
+    single_test("Reduce empty seq", test_reduce_empty_sequence);
+    single_test("TryGet invalid index", test_try_get_invalid_index);
+    single_test("GetFirst/Last empty", test_get_first_last_empty);
 
     std::cout << "_________Тесты завершены_________" << std::endl << std::endl;
 }

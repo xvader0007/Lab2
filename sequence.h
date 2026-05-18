@@ -187,7 +187,7 @@ public:
         return result;
     }
 
-    virtual IEnumerator<T>* GetEnumerator() = 0;
+    virtual IEnumerator<T>* GetEnumerator() const = 0;
 };
 
 #endif //LAB2_SEQUENCE_H

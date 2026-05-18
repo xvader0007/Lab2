@@ -12,25 +12,14 @@ class ListSequence : public Sequence<T>
 protected:
     LinkedList<T>* objects;
 
-    Sequence<T>* Append_Internal(T object)
-    {
+    void Append_Internal(T object) {
         objects->Append(object);
-
-        return this;
     }
-
-    Sequence<T>* Prepend_Internal(T object)
-    {
+    void Prepend_Internal(T object) {
         objects->Prepend(object);
-
-        return this;
     }
-
-    Sequence<T>* InsertAt_Internal(T object, int index)
-    {
+    void InsertAt_Internal(T object, int index) {
         objects->InsertAt(object, index);
-
-        return this;
     }
 
 public:
@@ -51,9 +40,9 @@ public:
     }
 
     //-------Геттеры-------
-    IEnumerator<T>* GetEnumerator() override
+    IEnumerator<T>* GetEnumerator() const override
     {
-        return new ListEnumerator<T>(this->objects);
+        return new ListEnumerator<T>(objects);
     }
 
     T GetFirst() const override
@@ -66,21 +55,17 @@ public:
         return objects->GetLast();
     }
 
-    T Get(int index) const override
-    {
-        if(index < 0 || index >= this->GetLen()) throw std::out_of_range("Index out of range");
-
+    T Get(int index) const override {
+        if (index < 0 || index >= objects->GetLen()) {
+            throw std::out_of_range("Index out of range");
+        }
         IEnumerator<T>* enumerator = this->GetEnumerator();
-
-        for(int i = 0; i <= index; i++)
-        {
-            if(!enumerator->MoveNext())
-            {
+        for (int i = 0; i <= index; ++i) {
+            if (!enumerator->MoveNext()) {
                 delete enumerator;
                 throw std::out_of_range("Index out of range");
             }
         }
-
         T result = enumerator->GetCurrent();
         delete enumerator;
         return result;
@@ -108,35 +93,32 @@ public:
     }
 
     //операции
-    Sequence<T>* Append(T object) override
-    {
-        return Append_Internal(object);
+    Sequence<T>* Append(T object) override {
+        auto* instance = static_cast<ListSequence<T>*>(this->Instance());
+        instance->Append_Internal(object);
+        return instance;
     }
 
-    Sequence<T>* Prepend(T object) override
-    {
-        return Prepend_Internal(object);
+    Sequence<T>* Prepend(T object) override {
+        auto* instance = static_cast<ListSequence<T>*>(this->Instance());
+        instance->Prepend_Internal(object);
+        return instance;
     }
 
-    Sequence<T>* InsertAt(T object, int index) override
-    {
-        return InsertAt_Internal(object, index);
+    Sequence<T>* InsertAt(T object, int index) override {
+        auto* instance = static_cast<ListSequence<T>*>(this->Instance());
+        instance->InsertAt_Internal(object, index);
+        return instance;
     }
 
-    Sequence<T>* Concat(Sequence<T>* other) const override
-    {
-        if(other == nullptr)
-        {
-            throw std::invalid_argument("Concat: нельзя объединить с nullptr");
+    Sequence<T>* Concat(Sequence<T>* other) const override {
+        if (other == nullptr) {
+            throw std::invalid_argument("Concat: nullptr");
         }
-
         ListSequence<T>* result = new ListSequence<T>(*this);
-
-        for(int i = 0; i < other->GetLen(); i++)
-        {
+        for (int i = 0; i < other->GetLen(); i++) {
             result->Append_Internal(other->Get(i));
         }
-
         return result;
     }
 
