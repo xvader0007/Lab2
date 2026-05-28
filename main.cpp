@@ -15,6 +15,8 @@ void run_tests();
 Sequence<int>* current_seq = nullptr; //глобальная пос. для работы в меню
 Sequence<int>* current_seq2 = nullptr;
 
+int current_type = 1;
+
 void clean()
 {
     delete current_seq;
@@ -88,14 +90,14 @@ Sequence<int>*& select_sequence(const std::string& name)
     return (choice == 1) ? current_seq : current_seq2;
 }
 
-void create_sequence(int type, int slot)
+void create_sequence(int slot)
 {
     int arr[] = { 1, 2, 3,};
     Sequence<int>*& target = (slot == 1) ? current_seq : current_seq2;
 
     delete target;
 
-    switch(type)
+    switch(current_type)
     {
         case 1:
             target = new MutableArraySequence<int>(arr, 3);
@@ -680,48 +682,49 @@ void clone_menu()
     delete clone;
 }
 
-void show_menu()
+void show_choice()
 {
-    std::cout << "\n________________MENU_________________\n";
-    std::cout << "| Создание (Seq1):                  |\n";
+    std::cout << "\n__________TYPE OF SEQUENCE___________\n";
     std::cout << "| 1.MutableArraySequence            |\n";
     std::cout << "| 2.MutableListSequence             |\n";
     std::cout << "| 3.ImmutableArraySequence          |\n";
     std::cout << "| 4.ImmutableListSequence           |\n";
     std::cout << "|___________________________________|\n";
-    std::cout << "| Создание (Seq2):                  |\n";
-    std::cout << "| 5.MutableArraySequence            |\n";
-    std::cout << "| 6.MutableListSequence             |\n";
-    std::cout << "| 7.ImmutableArraySequence          |\n";
-    std::cout << "| 8.ImmutableListSequence           |\n";
-    std::cout << "|___________________________________|\n";
-    std::cout << "| 9.Append                          |\n";
-    std::cout << "| 10.Prepend                        |\n";
-    std::cout << "| 11.InsertAt                       |\n";
-    std::cout << "|___________________________________|\n";
-    std::cout << "| Доступ:                           |\n";
-    std::cout << "| 12.Get(index)                     |\n";
-    std::cout << "| 13.operator[] (чтение)            |\n";
-    std::cout << "| 14.operator[] (запись)            |\n";
-    std::cout << "| 15.Print sequence                 |\n";
-    std::cout << "|___________________________________|\n";
-    std::cout << "| Дополнительные функции:           |\n";
-    std::cout << "| 16.Map(a*x + b)                   |\n";
-    std::cout << "| 17.Reduce(sum/prod/min/max)       |\n";
-    std::cout << "| 18.Where(условие)                 |\n";
-    std::cout << "| 19.Zip                            |\n";
-    std::cout << "| 20.FlatMap                        |\n";
-    std::cout << "| 21.Concat                         |\n";
-    std::cout << "| 22.Clone                          |\n";
-    std::cout << "|___________________________________|\n";
-    std::cout << "| Option / Try:                     |\n";
-    std::cout << "| 23. TryGet(index)                 |\n";
-    std::cout << "| 24. TryFind(условие)              |\n";
-    std::cout << "|___________________________________|\n";
-    std::cout << "| Система:                          |\n";
-    std::cout << "| 25. Запустить все тесты           |\n";
-    std::cout << "| 0. Выход                          |\n";
-    std::cout << "|___________________________________|\n";
+}
+
+void show_menu()
+{
+    std::cout << "\n________________MENU_________________\n";
+    std::cout << "| 1.Создание Seq1                    |\n";
+    std::cout << "| 2.Создание Seq2                    |\n";
+    std::cout << "|____________________________________|\n";
+    std::cout << "| 3.Append                           |\n";
+    std::cout << "| 4.Prepend                          |\n";
+    std::cout << "| 5.InsertAt                         |\n";
+    std::cout << "|____________________________________|\n";
+    std::cout << "| Доступ:                            |\n";
+    std::cout << "| 6.Get(index)                       |\n";
+    std::cout << "| 7.operator[] (чтение)              |\n";
+    std::cout << "| 8.operator[] (запись)              |\n";
+    std::cout << "| 9.Print sequence                   |\n";
+    std::cout << "|____________________________________|\n";
+    std::cout << "| Дополнительные функции:            |\n";
+    std::cout << "| 10.Map(a*x + b)                    |\n";
+    std::cout << "| 11.Reduce(sum/prod/min/max)        |\n";
+    std::cout << "| 12.Where(условие)                  |\n";
+    std::cout << "| 13.Zip                             |\n";
+    std::cout << "| 14.FlatMap                         |\n";
+    std::cout << "| 15.Concat                          |\n";
+    std::cout << "| 16.Clone                           |\n";
+    std::cout << "|____________________________________|\n";
+    std::cout << "| Option / Try:                      |\n";
+    std::cout << "| 17. TryGet(index)                  |\n";
+    std::cout << "| 18. TryFind(условие)               |\n";
+    std::cout << "|____________________________________|\n";
+    std::cout << "| Система:                           |\n";
+    std::cout << "| 19. Запустить все тесты            |\n";
+    std::cout << "| 0. Выход                           |\n";
+    std::cout << "|____________________________________|\n";
 }
 
 int main()
@@ -733,6 +736,16 @@ int main()
     std::cout << "|                                   |\n";
     std::cout << "| Михеев Дмитрий    группа: Б25-507 |\n";
     std::cout << "|___________________________________|\n";
+
+    //выбор типа
+    show_choice();
+    std::cout << "Введите номер типа (1-4): ";
+    if(!(std::cin >> current_type) || current_type < 1 || current_type > 4)
+    {
+        current_type = 1;
+        std::cout << "Неверный ввод. Выбран тип 1.\n";
+    }
+    clear_input_buffer();
 
     int choice;
 
@@ -755,74 +768,64 @@ int main()
         {
             switch(choice)
             {
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        create_sequence(choice, 1);
+                case 1:
+                    create_sequence(1);
                     break;
-                }
-                {
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                        create_sequence(choice - 4, 2);
-                        break;
-                }
-                case 9:
+                case 2:
+                    create_sequence(2);
+                    break;
+                case 3:
                     add_element(false); //append
                     break;
-                case 10:
+                case 4:
                     add_element(true); //prepend
                     break;
-                case 11:
+                case 5:
                     insert_at();
                     break;
-                case 12:
+                case 6:
                     get_element();
                     break;
-                case 13:
+                case 7:
                     read_bracket();
                     break;
-                case 14:
+                case 8:
                     write_bracket();
                     break;
-                case 15:
+                case 9:
                     std::cout << "Seq 1: ";
                     print_sequence(current_seq, "");
                     std::cout << "Seq 2: ";
                     print_sequence(current_seq2, "");
                     break;
-                case 16:
+                case 10:
                     map_menu();
                     break;
-                case 17:
+                case 11:
                     reduce_map();
                     break;
-                case 18:
+                case 12:
                     where_menu();
                     break;
-                case 19:
+                case 13:
                     zip_menu();
                     break;
-                case 20:
+                case 14:
                     flatmap_menu();
                     break;
-                case 21:
+                case 15:
                     concat_menu();
                     break;
-                case 22:
+                case 16:
                     clone_menu();
                     break;
-                case 23:
+                case 17:
                     try_get();
                     break;
-                case 24:
+                case 18:
                     try_find();
                     break;
-                case 25:
+                case 19:
                     run_tests();
                     break;
                 case 0:
