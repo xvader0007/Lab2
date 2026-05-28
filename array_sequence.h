@@ -45,28 +45,6 @@ protected:
         }
         objects->Set(index, object);
     }
-    /*
-    Sequence<T>* InsertAt_Internal(T object, int index)
-    {
-        if(index < 0 || index >= objects->GetSize())
-        {
-            throw std::out_of_range("IndexOutOfRangeException: индекс " +
-                                    std::to_string(index) + "не в диапозоне [0, " + std::to_string(objects->GetSize()) + "]");
-        }
-        else if(index == 0) return Prepend_Internal(object);
-        else if(index == objects->GetSize()) return Append_Internal(object);
-
-        objects->Resize(objects->GetSize() + 1);
-
-        for(int i = objects->GetSize() - 1; i > index; i--)
-        {
-            objects->Set(i, objects->Get(i - 1));
-        }
-
-        objects->Set(index, object);
-
-        return this;
-    }*/
 
 public:
     virtual Sequence<T>* Instance() override {return this; }
@@ -108,15 +86,22 @@ public:
     }
 
     T Get(int index) const override {
-        if (index < 0 || index >= objects->GetSize()) {
+        if (index < 0 || index >= objects->GetSize())
+        {
             throw std::out_of_range("Index out of range");
         }
+
         IEnumerator<T>* enumerator = this->GetEnumerator();
-        for (int i = 0; i <= index; ++i) {
-            if (!enumerator->MoveNext()) {
+        int current_ind = 0;
+
+        while(current_ind <= index)
+        {
+            if(!enumerator->MoveNext())
+            {
                 delete enumerator;
                 throw std::out_of_range("Index out of range");
             }
+            current_ind++;
         }
         T result = enumerator->GetCurrent();
         delete enumerator;

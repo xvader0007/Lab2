@@ -59,13 +59,20 @@ public:
         if (index < 0 || index >= objects->GetLen()) {
             throw std::out_of_range("Index out of range");
         }
+
         IEnumerator<T>* enumerator = this->GetEnumerator();
-        for (int i = 0; i <= index; ++i) {
-            if (!enumerator->MoveNext()) {
+        int current_ind = 0;
+
+        while(current_ind <= index)
+        {
+            if(!enumerator->MoveNext())
+            {
                 delete enumerator;
                 throw std::out_of_range("Index out of range");
             }
+            current_ind++;
         }
+
         T result = enumerator->GetCurrent();
         delete enumerator;
         return result;
