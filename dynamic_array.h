@@ -22,7 +22,7 @@ public:
     //конструктор из массива элементов
     DynamicArray(T* objects, int count) : size(count)
     {
-        if(count < 0) std::invalid_argument("Число не может быть отрицательным!");
+        if(count < 0) throw std::invalid_argument("Число не может быть отрицательным!");
 
         if(count == 0)
         {
@@ -141,22 +141,14 @@ public:
 
         else if(size == new_size) return;
 
-        else if(size == 0)
-        {
-            delete[] data;
-            data = nullptr;
-            size = 0;
-            return;
+        T* new_data = nullptr;
+        if(new_size > 0) {
+            new_data = new T[new_size]();
+            int count = (new_size < size) ? new_size : size;
+            for(int i = 0; i < count; i++) new_data[i] = data[i];
         }
 
-        T* new_data = new T[new_size]();
-
-        int count = (new_size < size) ? new_size : size;
-
-        for(int i = 0; i < count; i++) new_data[i] = data[i];
-
         delete[] data;
-
         data = new_data;
         size = new_size;
     }
@@ -174,7 +166,7 @@ public:
         return data[index];
     }
 
-    T& operator[](int index) const
+    const T& operator[](int index) const
     {
         if(index < 0 || index >= size)
         {
