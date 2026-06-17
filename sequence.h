@@ -9,7 +9,7 @@
 #include "list_sequence.h"
 #include "array_sequence.h"
 #include "ienumerable.h"
-//
+
 template<class T> class ArraySequence;
 
 template<class T>
