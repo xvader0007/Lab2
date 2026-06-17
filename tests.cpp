@@ -5,6 +5,15 @@
 #include "mutable_array_sequence.h"
 #include "immutable_array_sequence.h"
 
+int double_value(int x) { return x * 2; }
+int sum_accumulator(int acc, int x) { return acc + x; }
+bool is_even(int x) { return x % 2 == 0; }
+
+Sequence<int>* duplicate_element(int x) {
+    int* data = new int[2]{x, x + 10};
+    return new ArraySequence<int>(data, 2);
+}
+
 void test_basic_append_get()
 {
     int arr[] = {10, 20, 30};
@@ -54,7 +63,7 @@ void test_map()
     int arr[] = {1, 2, 3};
     Sequence<int>* seq = new ArraySequence<int>(arr, 3);
 
-    Sequence<int>* doubled = seq->Map([](int x) {return x * 2;});
+    Sequence<int>* doubled = seq->Map(&double_value);
 
     assert(doubled->GetLen() == 3 && "Неверная длина Map");
     assert(doubled->Get(0) == 2 && "неверный элемент 0 Map");
@@ -70,7 +79,7 @@ void test_reduce()
     int arr[] = {1, 2, 3, 4};
     Sequence<int>* seq = new ListSequence<int>(arr, 4);
 
-    int sum = seq->Reduce([](int a, int x) {return a + x;}, 0);
+    int sum = seq->Reduce(&sum_accumulator, 0);
 
     assert(sum == 10 && "Неправильная сумма Reduce");
 
@@ -82,7 +91,7 @@ void test_where()
     int arr[] = {1, 2, 3, 4, 5};
     Sequence<int>* seq = new ArraySequence<int>(arr, 5);
 
-    Sequence<int>* res = seq->Where([](int x) {return x % 2 == 0;});
+    Sequence<int>* res = seq->Where(&is_even);
 
     assert(res->GetLen() == 2 && "Неверная длина Where");
     assert(res->Get(0) == 2 && "Неверный элемент 0 Where");
@@ -122,10 +131,7 @@ void test_flatmap()
     int arr[] = {1, 2};
     Sequence<int>* seq = new ArraySequence<int>(arr, 2);
 
-    auto* result = seq->FlatMap([](int x) {
-            int* data = new int[2]{x, x + 10};
-            return new ArraySequence<int>(data, 2);
-    });
+    auto* result = seq->FlatMap<int>(&duplicate_element);
 
     assert(result->GetLen() == 4 && "FlatMap неверная длина");
     assert(result->Get(0) == 1 && "FlatMap элемент 0 неверный");
@@ -213,7 +219,7 @@ void test_reduce_empty_sequence()
     int empty[] = {};
     Sequence<int>* seq = new ArraySequence<int>(empty, 0);
 
-    int result = seq->Reduce([](int acc, int x) { return acc + x; }, 42);
+    int result = seq->Reduce(&sum_accumulator, 42);
     assert(result == 42 && "Reduce на пустой последовательности должен вернуть начальное значение");
 
     delete seq;

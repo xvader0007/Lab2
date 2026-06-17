@@ -42,35 +42,36 @@ public:
     //создание копии объекта
     virtual Sequence<T>* Clone() const = 0;
 
-    template<typename Func>
-    auto Map(Func f) const
+    Sequence<T>* Map(T (*f)(T)) const
     {
-        using ResultType = decltype(f(T{}));
+        if(this->GetLen() == 0)
+        {
+            return new ArraySequence<T>();
+        }
 
-        ResultType* results = new ResultType[this->GetLen()];
+        T* results = new T[this->GetLen()];
 
         for(int i = 0; i < this->GetLen(); i++)
         {
             results[i] = f(this->Get(i));
         }
 
-        Sequence<ResultType>* result = new ArraySequence<ResultType>(results, this->GetLen());
+        Sequence<T>* result = new ArraySequence<T>(results, this->GetLen());
         delete[] results;
 
         return result;
     }
 
-    template<typename Func, typename Temp>
-    Temp Reduce(Func f, Temp init) const
+    T Reduce(T (*f)(T, T), T init) const
     {
-        Temp tm = init;
+        T acc = init;
 
         for(int i = 0; i < this->GetLen(); i++)
         {
-            tm = f(tm, this->Get(i));
+            acc = f(acc, this->Get(i));
         }
 
-        return tm;
+        return acc;
     }
 
     //option + try
@@ -94,8 +95,7 @@ public:
         return Option<T>::exist(this->GetLast());
     }
 
-    template<typename Predicate>
-    Option<T> TryFind(Predicate pred) const
+    Option<T> TryFind(bool (*pred)(T)) const
     {
         for(int i = 0; i < this->GetLen(); i++)
         {
@@ -108,8 +108,7 @@ public:
     }
 
     //=====================доп операции==================
-    template<typename Predicate>
-    Sequence<T>* Where(Predicate pred) const
+    Sequence<T>* Where(bool (*pred)(T)) const
     {
         int count = 0;
 
@@ -156,14 +155,13 @@ public:
         return result;
     }
 
-    template<typename Func>
-    auto FlatMap(Func f) const
+    template<typename U>
+    Sequence<U>* FlatMap(Sequence<U>* (*f)(T)) const
     {
-        if(this->GetLen() == 0) throw std::runtime_error("FlatMap: пустая последовательность");
-
-        auto* first = f(this->Get(0));
-        using U = decltype(first->Get(0));
-        delete first;
+        if(this->GetLen() == 0)
+        {
+            return new ListSequence<U>();
+        }
 
         LinkedList<U>* temp = new LinkedList<U>();
 
@@ -176,7 +174,6 @@ public:
                 {
                     temp->Append(inner->Get(j));
                 }
-
                 delete inner;
             }
         }
