@@ -11,7 +11,7 @@
 #include "ienumerable.h"
 
 template<class T> class ArraySequence;
-//
+
 template<class T>
 class Sequence : public ICollection<T>, public IEnumerable<T>
 {
